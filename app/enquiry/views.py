@@ -13,7 +13,7 @@ def create_enquiry(db: Session, enquiry: EnquiryCreate):
     db.add(new_enquiry)
     db.commit()
     db.refresh(new_enquiry)
-    return new_enquiry
+    return {"send message confirmed we will contact you", new_enquiry}
 
 def get_all_enquiry(db: Session):
     return db.query(Enquiry).all()
@@ -34,4 +34,6 @@ def update_enquiry(enq_id: int, db: Session, enquiry: EnquiryUpdate):
     db.refresh(update_enquiry)
 
     return update_enquiry
+
+
 

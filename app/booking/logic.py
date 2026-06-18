@@ -1,15 +1,19 @@
 from sqlalchemy .orm import Session
+from fastapi import HTTPException
 from .models import Booking
 from .schemas import BookingCreate, BookingUpdate
 from app.package.models import Package
+from app.auth.security import get_current_user
 
 # new create booking
 def sent_booking(db: Session, booking: BookingCreate, user_id: int):
     package = db.query(Package).filter(Package.id==booking.package_id).first()
 
     if not package:
-        return None
-    
+        raise HTTPException(
+            status_code=404,
+            detail="Package not found"
+        )
     total_amount = package.price * booking.travellers_count
 
     new_booking = Booking(
@@ -47,3 +51,5 @@ def update_booking_status(booking: BookingUpdate, book_id: int, db: Session):
 
     return book_status
 
+def get_user_bookings(db: Session, user_id: int):
+    return db.query(Booking).filter(Booking.user_id == user_id).all()

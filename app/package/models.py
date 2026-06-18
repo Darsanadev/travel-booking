@@ -1,5 +1,6 @@
-from sqlalchemy import Column, String, Integer, Boolean
+from sqlalchemy import Column, String, Integer, Boolean, DateTime
 from app.database import Base
+from datetime import datetime
 
 class Package(Base):
     __tablename__ = 'package'
@@ -11,6 +12,14 @@ class Package(Base):
     days = Column(Integer)
     price = Column(Integer)
     image = Column(String)
-    
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow
+    )
+    updated_at = Column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
 
     is_active = Column(Boolean, default=True)

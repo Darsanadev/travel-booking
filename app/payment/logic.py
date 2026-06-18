@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from sqlalchemy .orm import Session
 from .models import Payment
 from .schemas import CreatePayment, UpdatePayment
@@ -7,8 +8,12 @@ import uuid
 def create_payment(db: Session, payment: CreatePayment):
     booking = db.query(Booking).filter(Booking.id == payment.booking_id).first()
 
+    
     if not booking:
-        return None
+        raise HTTPException(
+            status_code=404,
+            detail="Booking not found"
+        )
 
     new_payment = Payment(
         booking_id = booking.id,
@@ -41,4 +46,8 @@ def update_payment(db: Session, pay_id: int, payment: UpdatePayment):
 
     return payment_status
 
+def get_user_payments(db:Session, user_id: int):
+    return db.query(Payment).join(Booking, Payment.booking_id == Booking.id) .filter(Booking.user_id == user_id).all()
 
+
+  

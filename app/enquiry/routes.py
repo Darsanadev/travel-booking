@@ -1,14 +1,23 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app .database import get_db
 from . import views
 from .schema import EnquiryCreate, EnquiryUpdate
+from app.auth.security import get_current_user
 
 
 router = APIRouter(prefix="/enquiry", tags=["Enquiry"]) 
 
 @router.post('/')
-def create_enquiry(enquiry: EnquiryCreate, db: Session = Depends(get_db)):
+def create_enquiry(enquiry: EnquiryCreate,token: str, db: Session = Depends(get_db)):
+    current_user = get_current_user(token, db)
+
+    if not current_user:
+         raise HTTPException(
+            status_code=401,
+            detail="Unauthorized"
+        )
+
     return views.create_enquiry(db, enquiry)
 
 @router.get('/')
