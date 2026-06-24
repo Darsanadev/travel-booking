@@ -15,3 +15,22 @@ class Token(BaseModel):
     access_token: str
     token_type: str
     
+
+class VerifyOTP(BaseModel):
+    email: EmailStr
+    otp: str
+
+
+class ForgotPassword(BaseModel):
+    email: EmailStr
+    
+
+class ResetPassword(BaseModel):
+    email: EmailStr
+    otp: str
+    new_password: str
+
+
+class ResendOtp(BaseModel):
+    email: EmailStr
+    

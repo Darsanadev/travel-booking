@@ -3,7 +3,7 @@ from jose import jwt, JWTError
 from datetime import datetime, timedelta, timezone
 from pydantic import BaseModel
 from . models import User
-import re
+import re, random
 
 
 # Password Hash and verify the passwords
@@ -85,3 +85,6 @@ def validate_password(password: str):
     
     return None
   
+  
+def generate_otp():
+    return str(random.randint(100000, 999999))
