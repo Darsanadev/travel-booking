@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException
-from app.auth.schemas import UserRegister, UserLogin, VerifyOTP, ForgotPassword, ResetPassword
+from app.auth.schemas import UserRegister, UserLogin, VerifyOTP, ForgotPassword, ResetPassword, ResendOtp
 from app.auth.models import User
 from fastapi import Depends
 from sqlalchemy.orm import Session
@@ -164,3 +164,35 @@ def reset_password(pwd: ResetPassword, db: Session = Depends(get_db)):
     return {
     "message": "Password updated successfully"
 }
+
+
+def resendotp(email: str, db: Session ):
+    thatuser = db.query(User).filter(User.email == email).first()
+
+    if not thatuser:
+        return {"meassage": "User Not Found"}
+    
+     # Prevent spamming
+    if (thatuser.otp_expiry and datetime.utcnow() < thatuser.otp_expiry - timedelta(minutes=4)):
+        return {
+            "message": "Please wait before requesting another OTP"
+        }
+    
+    otp = generate_otp()
+
+    thatuser.otp = otp
+    thatuser.otp_expiry = (
+        datetime.utcnow()
+        + timedelta(minutes=5)
+    )
+
+    # if thatuser.otp.count() < 5:
+    #     return {"meassage": "Try after 5 mins"}
+    
+    db.commit()
+    send_otp_email(thatuser.email, otp)
+
+    return {
+        "message": "OTP sent successfully"
+    }
+
