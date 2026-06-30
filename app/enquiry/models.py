@@ -13,3 +13,8 @@ class Enquiry(Base):
     status = Column(String, default="Pending")
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+
+
+    

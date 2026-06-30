@@ -4,12 +4,12 @@ from .schemas import PackageCreate, PackageUpdate
 
 def create_package(db: Session, package: PackageCreate):
     new_package = Package(
-        title=package.title,
-        destination=package.destination,
-        description=package.description,
-        days=package.days,
-        price=package.price,
-        image=package.image
+        title = package.title,
+        destination_id=package.destination_id,
+        description = package.description,
+        days = package.days,
+        price = package.price,
+        image = package.image
     )
     db.add(new_package)
     db.commit()

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, Boolean, DateTime
+from sqlalchemy import Column, String, Integer, Boolean, DateTime, ForeignKey
 from app.database import Base
 from datetime import datetime
 
@@ -7,7 +7,7 @@ class Package(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String)
-    destination_id = Column(String)
+    destination_id = Column(Integer, ForeignKey("destination.id"))
     description = Column(String)
     days = Column(Integer)
     price = Column(Integer)
@@ -23,3 +23,4 @@ class Package(Base):
     )
 
     is_active = Column(Boolean, default=True)
+

@@ -3,7 +3,7 @@ from pydantic import BaseModel
 # creat
 class PackageCreate(BaseModel):
     title: str
-    destination: str
+    destination_id: int 
     description: str
     days: int
     price: int
@@ -12,7 +12,7 @@ class PackageCreate(BaseModel):
 # PUT/Patch
 class PackageUpdate(BaseModel):
     title: str | None = None
-    destination: str | None = None
+    destination_id: int | None = None
     description: str | None = None
     days: int | None = None
     price: int | None = None
@@ -22,7 +22,7 @@ class PackageUpdate(BaseModel):
 class PackageResponse(BaseModel):
     id: int
     title: str
-    destination: str
+    destination_id: int
     description: str
     days: int
     price: int
