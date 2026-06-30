@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from . import crud
 from . schemas import PackageCreate, PackageUpdate
+from app.auth.security import require_admin
+from auth. models import User
 
 router = APIRouter(
     prefix="/packages",
@@ -10,7 +12,7 @@ router = APIRouter(
 
 
 @router.post('/')
-def create_package(package: PackageCreate, db: Session = Depends(get_db)):
+def create_package(package: PackageCreate, db: Session = Depends(get_db), current_user: User = Depends(require_admin)):
     return crud.create_package(db, package)
 
 
@@ -25,10 +27,10 @@ def get_package(id: int, db:Session = Depends(get_db)):
 
 
 @router.put('/{id}')
-def update_package(id: int, package: PackageUpdate, db: Session = Depends(get_db)):
+def update_package(id: int, package: PackageUpdate, db: Session = Depends(get_db), current_user: User = Depends(require_admin)):
     return crud.update_package(db, package, id)
 
 
 @router.patch('/{id}/toggle')
-def hide_unhide(id: int, db: Session = Depends(get_db)):
+def hide_unhide(id: int, db: Session = Depends(get_db), current_user: User = Depends(require_admin)):
     return crud.hide_unhide(db, id)

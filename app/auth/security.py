@@ -1,4 +1,7 @@
 from pwdlib import PasswordHash
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+from app.database import get_db
 from jose import jwt, JWTError
 from datetime import datetime, timedelta, timezone
 from pydantic import BaseModel
@@ -17,6 +20,10 @@ import re, random
 SECRET_KEY = "7c69187bd82de56b863e1c97cc645af273842b4cf9e535e97a06bed5bc86d173"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+oauth2_scheme = OAuth2PasswordBearer(
+    tokenUrl="/auth/login"
+)
 
 password_hash = PasswordHash.recommended()
 
@@ -55,17 +62,17 @@ def verify_token(token: str):
     except JWTError:
         return None
 
-def get_current_user(token: str, db):
-    email = verify_token(token)
+# def get_current_user(token: str, db):
+#     email = verify_token(token)
 
-    if not email:
-        return None
+#     if not email:
+#         return None
     
-    user = db.query(User).filter(
-        User.email == email
-    ).first()
+#     user = db.query(User).filter(
+#         User.email == email
+#     ).first()
 
-    return user
+#     return user
 
 def validate_password(password: str):
     if len(password) < 8:
@@ -88,3 +95,41 @@ def validate_password(password: str):
   
 def generate_otp():
     return str(random.randint(100000, 999999))
+
+def get_current_user(
+    token: str = Depends(oauth2_scheme), db=Depends(get_db)):
+
+    email = verify_token(token)
+
+    if email is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token"
+        )
+
+    user = db.query(User).filter(
+        User.email == email
+    ).first()
+
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found"
+        )
+
+    return user
+def require_admin(current_user: User = Depends(get_current_user)):
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required"
+        )
+    return current_user
+
+def require_customer(current_user=Depends(get_current_user)):
+    if current_user.role != "customer":
+        raise HTTPException(
+            status_code=403,
+            detail="Customer access required"
+        )
+    return current_user
